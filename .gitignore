@@ -1,0 +1,84 @@
+# ==========================================
+# PESTFIND - GITIGNORE
+# React + Vite + Firebase
+# ==========================================
+
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Build output
+dist/
+build/
+out/
+
+# Environment variables - NEVER UPLOAD SECRETS
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# Firebase private credentials
+service-account*.json
+firebase-adminsdk*.json
+*-service-account.json
+
+# Firebase local cache and debug files
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Testing and coverage
+coverage/
+.nyc_output/
+
+# Vite
+.vite/
+
+# Cache
+.cache/
+.parcel-cache/
+.eslintcache
+
+# Operating system files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE and editor files
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+*.old
+
+# TypeScript
+*.tsbuildinfo
+
+# Deployment
+.vercel/
+.netlify/
+
+# Miscellaneous
+*.orig
+*.rej
