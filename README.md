@@ -1,16 +1,66 @@
-# React + Vite
+# OfficialPestFind
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React application built with Vite.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React
+- Vite
+- JavaScript
+- Firebase
+- ESLint
+
+## Getting Started
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/TechPestFind/OfficialPestFind.git
+```
+
+### 2. Navigate to the project
+
+```bash
+cd OfficialPestFind
+```
+
+### 3. Install dependencies
+
+```bash
+npm install
+```
+
+### 4. Configure environment variables
+
+Create a `.env` file in the project root and add your required Firebase configuration.
+
+Never commit your `.env` file or private credentials.
+
+### 5. Start development server
+
+```bash
+npm run dev
+```
+
+## React + Vite
+
+This project uses Vite for a fast development experience with Hot Module Replacement (HMR) and ESLint rules.
+
+Official React plugins:
+
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc)
 
 ## React Compiler
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+The React Compiler is not enabled by default in the Vite template. Refer to the [React Compiler documentation](https://react.dev/learn/react-compiler/installation) for setup instructions.
 
-## Expanding the ESLint configuration
+## ESLint Configuration
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+For production applications, consider enabling TypeScript with type-aware lint rules.
+
+See the [typescript-eslint documentation](https://typescript-eslint.io).
+
+## Repository
+
+[GitHub - TechPestFind/OfficialPestFind](https://github.com/TechPestFind/OfficialPestFind)
