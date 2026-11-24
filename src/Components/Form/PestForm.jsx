@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  serverTimestamp,
+} from "firebase/firestore";
 import { db } from "../../firebase/firebase";
 
 const initialFormData = {
@@ -10,6 +14,7 @@ const initialFormData = {
   address: "",
   pincode: "",
   priceRange: "",
+  pricingPlan: "",
   name: "",
   mobile: "",
   email: "",
@@ -17,6 +22,7 @@ const initialFormData = {
   preferredTime: "",
 };
 
+// PROPERTY SUB TYPES
 const propertySubTypes = {
   Residential: [
     "Apartment / Flat",
@@ -42,16 +48,78 @@ const propertySubTypes = {
   ],
 };
 
-const propertyPriceRanges = {
-  Residential: ["₹1,000 – ₹2,500", "₹2,500 – ₹5,000", "₹5,000+"],
-  Commercial: ["As per the sq. ft."],
-  Restaurant: ["As per the sq. ft."],
+// RESIDENTIAL PROPERTY SIZES
+const residentialPropertySizes = [
+  "1 RK",
+  "1 BHK",
+  "2 BHK",
+  "3 BHK",
+  "4 BHK",
+  "More than 4 BHK",
+];
+
+// RESIDENTIAL TREATMENT PRICING
+const residentialTreatmentPrices = {
+  "General Pest Control": {
+    Basic: "Basic ₹999 – ₹1,199",
+    Standard: "Standard ₹1,200 – ₹1,499",
+    Advanced: "Advanced ₹1,500 – ₹1,799",
+  },
+
+  "Cockroach Control": {
+    Basic: "Basic ₹899 – ₹999",
+    Standard: "Standard ₹1,000 – ₹1,249",
+    Advanced: "Advanced ₹1,250 – ₹1,499",
+  },
+
+  "Termite Control": {
+    Basic: "Basic ₹2,500 – ₹3,500",
+    Standard: "Standard ₹3,500 – ₹5,000",
+    Advanced: "Advanced ₹5,000 – ₹7,000",
+  },
+
+  "Bed Bug Control": {
+    Basic: "Basic ₹1,500 – ₹2,000",
+    Standard: "Standard ₹2,000 – ₹3,000",
+    Advanced: "Advanced ₹3,000 – ₹4,500",
+  },
+
+  "Rodent Control": {
+    Basic: "Basic ₹1,500 – ₹2,000",
+    Standard: "Standard ₹2,000 – ₹3,000",
+    Advanced: "Advanced ₹3,000 – ₹4,000",
+  },
+
+  "Mosquito Control": {
+    Basic: "Basic ₹1,000 – ₹1,500",
+    Standard: "Standard ₹1,500 – ₹2,500",
+    Advanced: "Advanced ₹2,500 – ₹3,500",
+  },
+
+  "Ant Control": {
+    Basic: "Basic ₹1,500 – ₹2,000",
+    Standard: "Standard ₹2,000 – ₹3,000",
+    Advanced: "Advanced ₹3,000 – ₹4,500",
+  },
 };
 
+const residentialPriceOptions = [
+  "Basic",
+  "Standard",
+  "Advanced",
+];
+
+const inspectionPricing = {
+  pricingPlan: "Inspection Required",
+  priceRange: "Price to be determined after inspection",
+};
+
+// DATE HELPERS
 const formatLocalDate = (date) => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
+
   return `${year}-${month}-${day}`;
 };
 
@@ -59,6 +127,7 @@ const getTodayLocalDate = () => formatLocalDate(new Date());
 
 const getOneMonthFromToday = () => {
   const today = new Date();
+
   const targetMonth = new Date(
     today.getFullYear(),
     today.getMonth() + 1,
@@ -78,6 +147,7 @@ const getOneMonthFromToday = () => {
   return formatLocalDate(targetMonth);
 };
 
+// STYLING
 const baseInputClass =
   "block h-[50px] w-full min-w-0 rounded-xl sm:rounded-[15px] border border-[#D5DED9] bg-white px-3.5 sm:px-4 text-base text-gray-700 outline-none transition placeholder:text-gray-400 focus:border-[#007A43] focus:ring-2 focus:ring-[#007A43]/10 disabled:cursor-not-allowed disabled:bg-gray-100";
 
@@ -86,8 +156,11 @@ const labelClass =
 
 const PestRequestForm = ({ selectedTreatment }) => {
   const [step, setStep] = useState(1);
+
   const [formData, setFormData] = useState(initialFormData);
+
   const [errors, setErrors] = useState({});
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [popup, setPopup] = useState({
@@ -100,31 +173,35 @@ const PestRequestForm = ({ selectedTreatment }) => {
   const today = getTodayLocalDate();
   const maxDate = getOneMonthFromToday();
 
-  // Checklist PDF location
+  // CHECKLIST PDF LOCATION
   const checklistUrl = `${
     import.meta.env.BASE_URL
   }PestFind_Enhanced_Illustrated_Checklist_Final.pdf`;
 
-  // Handle selected treatment
+  // HANDLE SELECTED TREATMENT FROM PARENT
   useEffect(() => {
     if (!selectedTreatment) return;
 
     setFormData((prev) => ({
       ...prev,
       treatment: selectedTreatment,
+      priceRange: "",
+      pricingPlan: "",
     }));
 
     setErrors((prev) => ({
       ...prev,
       treatment: "",
+      priceRange: "",
     }));
 
     setStep(1);
   }, [selectedTreatment]);
 
-  // Handle input changes
+  // HANDLE INPUT CHANGES
   const handleChange = (event) => {
     const { name, value } = event.target;
+
     let finalValue = value;
 
     if (name === "mobile") {
@@ -142,23 +219,83 @@ const PestRequestForm = ({ selectedTreatment }) => {
         .slice(0, 50);
     }
 
-    if (name === "propertySize") {
+    // NUMERIC PROPERTY SIZE ONLY FOR COMMERCIAL / RESTAURANT
+    if (
+      name === "propertySize" &&
+      formData.propertyType !== "Residential"
+    ) {
       finalValue = value.replace(/\D/g, "").slice(0, 7);
     }
 
-    // Reset dependent fields when property type changes
+    // RESET PRICE WHEN TREATMENT CHANGES
+    if (name === "treatment") {
+      setFormData((prev) => ({
+        ...prev,
+        treatment: finalValue,
+        priceRange: "",
+        pricingPlan: "",
+      }));
+
+      setErrors((prev) => ({
+        ...prev,
+        treatment: "",
+        priceRange: "",
+      }));
+
+      return;
+    }
+
+    // RESET DEPENDENT FIELDS WHEN PROPERTY TYPE CHANGES
     if (name === "propertyType") {
       setFormData((prev) => ({
         ...prev,
         propertyType: finalValue,
         propertySubType: "",
+        propertySize: "",
         priceRange: "",
+        pricingPlan: "",
       }));
 
       setErrors((prev) => ({
         ...prev,
         propertyType: "",
         propertySubType: "",
+        propertySize: "",
+        priceRange: "",
+      }));
+
+      return;
+    }
+
+    // HANDLE RESIDENTIAL PRICING PLAN
+    if (name === "priceRange") {
+      if (formData.propertyType === "Residential") {
+        if (value === "Inspection Required") {
+          setFormData((prev) => ({
+            ...prev,
+            pricingPlan: inspectionPricing.pricingPlan,
+            priceRange: inspectionPricing.priceRange,
+          }));
+        } else {
+          const selectedPrice =
+            residentialTreatmentPrices[formData.treatment]?.[value];
+
+          setFormData((prev) => ({
+            ...prev,
+            pricingPlan: value,
+            priceRange: selectedPrice || "",
+          }));
+        }
+      } else {
+        setFormData((prev) => ({
+          ...prev,
+          pricingPlan: "",
+          priceRange: value,
+        }));
+      }
+
+      setErrors((prev) => ({
+        ...prev,
         priceRange: "",
       }));
 
@@ -179,7 +316,6 @@ const PestRequestForm = ({ selectedTreatment }) => {
   // STEP 1 VALIDATION
   const validateStep1 = () => {
     const newErrors = {};
-    const propertySize = Number(formData.propertySize);
 
     if (!formData.treatment) {
       newErrors.treatment =
@@ -196,15 +332,34 @@ const PestRequestForm = ({ selectedTreatment }) => {
         "Please select a property sub-type.";
     }
 
-    if (!formData.propertySize) {
-      newErrors.propertySize =
-        "Please enter the property area.";
-    } else if (propertySize <= 0) {
-      newErrors.propertySize =
-        "Area must be greater than 0 sq.ft.";
-    } else if (propertySize > 1000000) {
-      newErrors.propertySize =
-        "Please enter a valid property area.";
+    // RESIDENTIAL PROPERTY SIZE VALIDATION
+    if (formData.propertyType === "Residential") {
+      if (!formData.propertySize) {
+        newErrors.propertySize =
+          "Please select your property size.";
+      } else if (
+        !residentialPropertySizes.includes(formData.propertySize)
+      ) {
+        newErrors.propertySize =
+          "Please select a valid residential property size.";
+      }
+    } else {
+      // COMMERCIAL / RESTAURANT AREA VALIDATION
+      const propertySize = Number(formData.propertySize);
+
+      if (!formData.propertySize) {
+        newErrors.propertySize =
+          "Please enter the property area.";
+      } else if (
+        !Number.isFinite(propertySize) ||
+        propertySize <= 0
+      ) {
+        newErrors.propertySize =
+          "Area must be greater than 0 sq.ft.";
+      } else if (propertySize > 1000000) {
+        newErrors.propertySize =
+          "Please enter a valid property area.";
+      }
     }
 
     setErrors(newErrors);
@@ -215,13 +370,15 @@ const PestRequestForm = ({ selectedTreatment }) => {
   // STEP 2 VALIDATION
   const validateStep2 = () => {
     const newErrors = {};
+
     const cleanAddress = formData.address.trim();
     const pincode = formData.pincode.trim();
 
     if (!cleanAddress) {
       newErrors.address = "Address is required.";
     } else if (cleanAddress.length < 10) {
-      newErrors.address = "Please enter a complete address.";
+      newErrors.address =
+        "Please enter a complete address.";
     } else if (cleanAddress.length > 200) {
       newErrors.address =
         "Address cannot exceed 200 characters.";
@@ -234,7 +391,7 @@ const PestRequestForm = ({ selectedTreatment }) => {
 
     if (!formData.priceRange) {
       newErrors.priceRange =
-        "Please select a price range.";
+        "Please select a pricing plan.";
     }
 
     setErrors(newErrors);
@@ -249,14 +406,17 @@ const PestRequestForm = ({ selectedTreatment }) => {
     const name = formData.name.trim();
     const mobile = formData.mobile.trim();
     const email = formData.email.trim();
+
     const preferredDate = formData.preferredDate;
 
     if (!name) {
       newErrors.name = "Name is required.";
     } else if (name.length < 2) {
-      newErrors.name = "Please enter your full name.";
+      newErrors.name =
+        "Please enter your full name.";
     } else if (name.length > 50) {
-      newErrors.name = "Name cannot exceed 50 characters.";
+      newErrors.name =
+        "Name cannot exceed 50 characters.";
     } else if (
       !/^[A-Za-z]+(?:[.'-]?[A-Za-z]+)*(?:\s+[A-Za-z]+(?:[.'-]?[A-Za-z]+)*)*$/.test(
         name
@@ -275,7 +435,8 @@ const PestRequestForm = ({ selectedTreatment }) => {
     } else if (
       !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)
     ) {
-      newErrors.email = "Enter a valid email address.";
+      newErrors.email =
+        "Enter a valid email address.";
     }
 
     if (!preferredDate) {
@@ -302,7 +463,9 @@ const PestRequestForm = ({ selectedTreatment }) => {
   // NEXT STEP
   const nextStep = () => {
     const isValid =
-      step === 1 ? validateStep1() : validateStep2();
+      step === 1
+        ? validateStep1()
+        : validateStep2();
 
     if (!isValid) return;
 
@@ -344,17 +507,32 @@ const PestRequestForm = ({ selectedTreatment }) => {
         {
           requestId: "",
           treatment: formData.treatment.trim(),
+
           propertyType: formData.propertyType,
           propertySubType: formData.propertySubType,
-          propertySize: Number(formData.propertySize),
+
+          // SAVE RESIDENTIAL SIZE AS STRING
+          // SAVE COMMERCIAL / RESTAURANT SIZE AS NUMBER
+          propertySize:
+            formData.propertyType === "Residential"
+              ? formData.propertySize
+              : Number(formData.propertySize),
+
           address: formData.address.trim(),
           pincode: formData.pincode,
+
+          // PRICING INFORMATION
+          pricingPlan: formData.pricingPlan,
           priceRange: formData.priceRange,
+
           name: formData.name.trim(),
           mobile: formData.mobile,
+
           email: formData.email.trim().toLowerCase(),
+
           preferredDate: formData.preferredDate,
           preferredTime: formData.preferredTime,
+
           createdAt: serverTimestamp(),
         }
       );
@@ -364,12 +542,12 @@ const PestRequestForm = ({ selectedTreatment }) => {
         docRef.id
       );
 
-      // Reset form after successful submission
+      // RESET FORM
       setFormData(initialFormData);
       setErrors({});
       setStep(1);
 
-      // Show success popup with checklist download
+      // SUCCESS POPUP
       setPopup({
         show: true,
         type: "success",
@@ -377,7 +555,6 @@ const PestRequestForm = ({ selectedTreatment }) => {
         message:
           "Your pest service request has been successfully submitted. Our team will review your request and coordinate with a suitable service partner.",
       });
-
     } catch (error) {
       console.error("Error saving form:", error);
 
@@ -388,7 +565,6 @@ const PestRequestForm = ({ selectedTreatment }) => {
         message:
           "We couldn't submit your request right now. Please check your internet connection and try again.",
       });
-
     } finally {
       setIsSubmitting(false);
     }
@@ -412,6 +588,10 @@ const PestRequestForm = ({ selectedTreatment }) => {
         {errors[field]}
       </p>
     ) : null;
+
+  // GET CURRENT RESIDENTIAL PRICES
+  const currentTreatmentPrices =
+    residentialTreatmentPrices[formData.treatment];
 
   return (
     <>
@@ -469,7 +649,7 @@ const PestRequestForm = ({ selectedTreatment }) => {
               className="mt-5 sm:mt-6"
             >
 
-              {/* STEP 1 */}
+              {/* ================= STEP 1 ================= */}
               {step === 1 && (
                 <div className="space-y-4 sm:space-y-5">
 
@@ -493,16 +673,45 @@ const PestRequestForm = ({ selectedTreatment }) => {
                         "appearance-auto"
                       )}
                     >
-                      <option value="">Choose treatment</option>
-                      <option value="Cockroach Control">Cockroach Control</option>
-                      <option value="Termite Control">Termite Control</option>
-                      <option value="Bed Bug Control">Bed Bug Control</option>
-                      <option value="Rodent Control">Rodent Control</option>
-                      <option value="Mosquito Control">Mosquito Control</option>
-                      <option value="Ant Control">Ant Control</option>
-                      <option value="General Pest Control">General Pest Control</option>
-                      <option value="Not Sure">Not Sure</option>
-                      <option value="Other">Other</option>
+                      <option value="">
+                        Choose treatment
+                      </option>
+
+                      <option value="Cockroach Control">
+                        Cockroach Control
+                      </option>
+
+                      <option value="Termite Control">
+                        Termite Control
+                      </option>
+
+                      <option value="Bed Bug Control">
+                        Bed Bug Control
+                      </option>
+
+                      <option value="Rodent Control">
+                        Rodent Control
+                      </option>
+
+                      <option value="Mosquito Control">
+                        Mosquito Control
+                      </option>
+
+                      <option value="Ant Control">
+                        Ant Control
+                      </option>
+
+                      <option value="General Pest Control">
+                        General Pest Control
+                      </option>
+
+                      <option value="Not Sure">
+                        Not Sure
+                      </option>
+
+                      <option value="Other">
+                        Other
+                      </option>
                     </select>
 
                     <ErrorMessage field="treatment" />
@@ -525,10 +734,21 @@ const PestRequestForm = ({ selectedTreatment }) => {
                       aria-invalid={Boolean(errors.propertyType)}
                       className={getInputClass("propertyType")}
                     >
-                      <option value="">Choose property type</option>
-                      <option value="Residential">Residential</option>
-                      <option value="Commercial">Commercial</option>
-                      <option value="Restaurant">Restaurant</option>
+                      <option value="">
+                        Choose property type
+                      </option>
+
+                      <option value="Residential">
+                        Residential
+                      </option>
+
+                      <option value="Commercial">
+                        Commercial
+                      </option>
+
+                      <option value="Restaurant">
+                        Restaurant
+                      </option>
                     </select>
 
                     <ErrorMessage field="propertyType" />
@@ -553,16 +773,20 @@ const PestRequestForm = ({ selectedTreatment }) => {
                         className={getInputClass("propertySubType")}
                       >
                         <option value="">
-                          Choose {formData.propertyType.toLowerCase()} type
+                          Choose{" "}
+                          {formData.propertyType.toLowerCase()} type
                         </option>
 
-                        {propertySubTypes[formData.propertyType]?.map(
-                          (subType) => (
-                            <option key={subType} value={subType}>
-                              {subType}
-                            </option>
-                          )
-                        )}
+                        {propertySubTypes[
+                          formData.propertyType
+                        ]?.map((subType) => (
+                          <option
+                            key={subType}
+                            value={subType}
+                          >
+                            {subType}
+                          </option>
+                        ))}
                       </select>
 
                       <ErrorMessage field="propertySubType" />
@@ -578,32 +802,55 @@ const PestRequestForm = ({ selectedTreatment }) => {
                       AREA / PROPERTY SIZE *
                     </label>
 
-                    <div
-                      className={`flex h-[50px] min-w-0 items-center rounded-xl border bg-white transition focus-within:border-[#007A43] focus-within:ring-2 focus-within:ring-[#007A43]/10 sm:rounded-[15px] ${
-                        errors.propertySize
-                          ? "border-red-500"
-                          : "border-[#D5DED9]"
-                      }`}
-                    >
-                      <input
+                    {formData.propertyType === "Residential" ? (
+                      // RESIDENTIAL DROPDOWN
+                      <select
                         id="propertySize"
-                        type="number"
                         name="propertySize"
                         value={formData.propertySize}
                         onChange={handleChange}
-                        min="1"
-                        max="1000000"
-                        step="1"
-                        inputMode="numeric"
-                        placeholder="Enter area"
                         aria-invalid={Boolean(errors.propertySize)}
-                        className="h-full min-w-0 flex-1 rounded-l-xl border-0 bg-transparent px-3.5 text-base text-gray-700 outline-none placeholder:text-gray-400 sm:rounded-l-[15px] sm:px-4"
-                      />
+                        className={getInputClass("propertySize")}
+                      >
+                        <option value="">
+                          Select property size
+                        </option>
 
-                      <span className="shrink-0 px-3 text-sm font-semibold text-gray-500 sm:px-4 sm:text-[15px]">
-                        sq.ft.
-                      </span>
-                    </div>
+                        {residentialPropertySizes.map((size) => (
+                          <option key={size} value={size}>
+                            {size}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      // COMMERCIAL / RESTAURANT NUMERIC INPUT
+                      <div
+                        className={`flex h-[50px] min-w-0 items-center rounded-xl border bg-white transition focus-within:border-[#007A43] focus-within:ring-2 focus-within:ring-[#007A43]/10 sm:rounded-[15px] ${
+                          errors.propertySize
+                            ? "border-red-500"
+                            : "border-[#D5DED9]"
+                        }`}
+                      >
+                        <input
+                          id="propertySize"
+                          type="number"
+                          name="propertySize"
+                          value={formData.propertySize}
+                          onChange={handleChange}
+                          min="1"
+                          max="1000000"
+                          step="1"
+                          inputMode="numeric"
+                          placeholder="Enter area"
+                          aria-invalid={Boolean(errors.propertySize)}
+                          className="h-full min-w-0 flex-1 rounded-l-xl border-0 bg-transparent px-3.5 text-base text-gray-700 outline-none placeholder:text-gray-400 sm:rounded-l-[15px] sm:px-4"
+                        />
+
+                        <span className="shrink-0 px-3 text-sm font-semibold text-gray-500 sm:px-4 sm:text-[15px]">
+                          sq.ft.
+                        </span>
+                      </div>
+                    )}
 
                     <ErrorMessage field="propertySize" />
                   </div>
@@ -622,7 +869,7 @@ const PestRequestForm = ({ selectedTreatment }) => {
                 </div>
               )}
 
-              {/* STEP 2 */}
+              {/* ================= STEP 2 ================= */}
               {step === 2 && (
                 <div className="space-y-4 sm:space-y-5">
 
@@ -681,44 +928,94 @@ const PestRequestForm = ({ selectedTreatment }) => {
                       <ErrorMessage field="pincode" />
                     </div>
 
-                    {/* PRICE RANGE */}
+                    {/* DYNAMIC PRICE RANGE */}
                     <div className="min-w-0">
                       <label
                         htmlFor="priceRange"
                         className={labelClass}
                       >
                         {formData.propertyType === "Residential"
-                          ? "PRICE RANGE *"
+                          ? "SELECT YOUR PLAN *"
                           : "PRICING OPTION *"}
                       </label>
 
                       <select
                         id="priceRange"
                         name="priceRange"
-                        value={formData.priceRange}
+                        value={
+                          formData.propertyType === "Residential"
+                            ? formData.pricingPlan
+                            : formData.priceRange
+                        }
                         onChange={handleChange}
                         disabled={!formData.propertyType}
                         aria-invalid={Boolean(errors.priceRange)}
                         className={getInputClass("priceRange")}
                       >
                         <option value="">
-                          {!formData.propertyType
-                            ? "Select property type first"
-                            : formData.propertyType === "Residential"
-                            ? "Choose price range"
+                          {formData.propertyType === "Residential"
+                            ? "Choose your plan"
                             : "Choose pricing option"}
                         </option>
 
-                        {propertyPriceRanges[formData.propertyType]?.map(
-                          (range) => (
-                            <option key={range} value={range}>
-                              {range}
+                        {/* RESIDENTIAL PRICING */}
+                        {formData.propertyType === "Residential" &&
+                          currentTreatmentPrices &&
+                          residentialPriceOptions.map((plan) => (
+                            <option
+                              key={plan}
+                              value={plan}
+                            >
+                              {plan} (
+                              {currentTreatmentPrices[plan]}
+                              )
                             </option>
-                          )
-                        )}
+                          ))}
+
+                        {/* INSPECTION-BASED PRICING */}
+                        {formData.propertyType === "Residential" &&
+                          !currentTreatmentPrices && (
+                            <option value="Inspection Required">
+                              Price after inspection
+                            </option>
+                          )}
+
+                        {/* COMMERCIAL / RESTAURANT PRICING */}
+                        {formData.propertyType !== "Residential" &&
+                          formData.propertyType && (
+                            <option value="As per the sq. ft.">
+                              As per the sq. ft. 
+                            (Free Site Inspection)
+                            </option>
+                          )}
                       </select>
 
                       <ErrorMessage field="priceRange" />
+
+                      {/* SHOW SELECTED PRICE DETAILS */}
+                      {formData.propertyType === "Residential" &&
+                        formData.pricingPlan &&
+                        formData.pricingPlan !==
+                          "Inspection Required" && (
+                          <div className="mt-2 rounded-lg bg-[#E7F4EE] px-3 py-2">
+                            <p className="text-xs font-semibold text-[#007A43]">
+                              Selected Plan:{" "}
+                              {formData.pricingPlan}
+                            </p>
+
+                            <p className="mt-1 text-sm font-bold text-[#14231D]">
+                              {formData.priceRange}
+                            </p>
+                          </div>
+                        )}
+
+                      {formData.pricingPlan ===
+                        "Inspection Required" && (
+                        <p className="mt-2 text-xs leading-5 text-gray-500">
+                          Final pricing will be shared after
+                          property inspection.
+                        </p>
+                      )}
                     </div>
                   </div>
 
@@ -744,7 +1041,7 @@ const PestRequestForm = ({ selectedTreatment }) => {
                 </div>
               )}
 
-              {/* STEP 3 */}
+              {/* ================= STEP 3 ================= */}
               {step === 3 && (
                 <div className="space-y-4 sm:space-y-5">
 
@@ -874,13 +1171,18 @@ const PestRequestForm = ({ selectedTreatment }) => {
                         aria-invalid={Boolean(errors.preferredTime)}
                         className={getInputClass("preferredTime")}
                       >
-                        <option value="">Choose time</option>
+                        <option value="">
+                          Choose time
+                        </option>
+
                         <option value="Morning 9AM - 12 PM">
                           Morning [9AM - 12 PM]
                         </option>
+
                         <option value="Afternoon 12 PM - 4 PM">
                           Afternoon [12 PM - 4 PM]
                         </option>
+
                         <option value="Evening 4 PM - 10 PM">
                           Evening [4 PM - 7 PM]
                         </option>
@@ -927,7 +1229,7 @@ const PestRequestForm = ({ selectedTreatment }) => {
         </div>
       </section>
 
-      {/* SUCCESS / ERROR POPUP */}
+      {/* ================= SUCCESS / ERROR POPUP ================= */}
       {popup.show && (
         <div
           className="fixed inset-0 z-[9999] flex items-center justify-center overflow-y-auto bg-black/50 px-3 py-5 backdrop-blur-sm sm:px-5"
@@ -1007,14 +1309,13 @@ const PestRequestForm = ({ selectedTreatment }) => {
                 {/* CONFIRMATION MESSAGE */}
                 <div className="mt-5 rounded-xl bg-[#F4F8F6] px-4 py-3 sm:rounded-2xl">
                   <p className="text-xs font-semibold leading-5 text-[#4C5B55]">
-                    No payment is required. We'll coordinate the next
-                    steps after your request is reviewed.
+                    No payment is required. We'll coordinate the
+                    next steps after your request is reviewed.
                   </p>
                 </div>
 
                 {/* CHECKLIST DOWNLOAD CARD */}
                 <div className="mt-5 rounded-2xl border border-[#D5E9DE] bg-[#F5FAF7] p-4 text-left sm:p-5">
-
                   <div className="flex items-center gap-3">
 
                     {/* PDF ICON */}

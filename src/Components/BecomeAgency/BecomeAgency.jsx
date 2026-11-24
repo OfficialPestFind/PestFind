@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
 
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -9,266 +8,255 @@ import BecomeAgencyForm from "../Form/BecomeAgencyForm";
 
 gsap.registerPlugin(ScrollTrigger);
 
+const benefits = [
+  {
+    number: "01",
+    title: "Relevant Requests",
+    description:
+      "Receive opportunities aligned with the areas and services your agency provides.",
+    icon: "◎",
+  },
+  {
+    number: "02",
+    title: "Local Opportunities",
+    description:
+      "Build your business by connecting with customers in the locations you serve.",
+    icon: "⌖",
+  },
+  {
+    number: "03",
+    title: "Organised Communication",
+    description:
+      "Access customer requirements and preferred service timings for better coordination.",
+    icon: "↗",
+  },
+  {
+    number: "04",
+    title: "Simple Process",
+    description:
+      "Respond to customer requests and coordinate the confirmed service efficiently.",
+    icon: "✓",
+  },
+];
+
+const steps = [
+  {
+    number: "01",
+    title: "Register Your Agency",
+    description:
+      "Complete the agency registration form with your business and contact details.",
+  },
+  {
+    number: "02",
+    title: "Share Your Services",
+    description:
+      "Tell us about your pest control services and the locations your agency covers.",
+  },
+  {
+    number: "03",
+    title: "Receive Requests",
+    description:
+      "Get relevant customer enquiries based on your service areas and offerings.",
+  },
+  {
+    number: "04",
+    title: "Connect With Customers",
+    description:
+      "Coordinate with customers, understand their requirements and arrange services.",
+  },
+];
+
+const requirements = [
+  "Pest control service providers",
+  "Local pest control agencies",
+  "Professional service teams",
+  "Agencies serving defined locations",
+];
+
 const BecomeAgency = () => {
   const pageRef = useRef(null);
 
-  // =========================================================
+  // ==========================================
   // GSAP ANIMATIONS
-  // =========================================================
+  // ==========================================
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // =================================
-      // HERO ANIMATION
-      // =================================
+      const mm = gsap.matchMedia();
 
-      const tl = gsap.timeline({
-        defaults: {
-          ease: "power3.out",
-        },
-      });
+      mm.add(
+        "(prefers-reduced-motion: no-preference)",
+        () => {
+          // HERO ANIMATION
 
-      tl.from(".agency-tag", {
-        y: 25,
-        opacity: 0,
-        duration: 0.6,
-      })
+          const heroTimeline = gsap.timeline({
+            defaults: {
+              ease: "power3.out",
+            },
+          });
 
-        .from(
-          ".agency-title",
-          {
-            x: -60,
+          heroTimeline
+            .from(".agency-tag", {
+              y: 20,
+              opacity: 0,
+              duration: 0.5,
+            })
+            .from(
+              ".agency-title",
+              {
+                x: -45,
+                opacity: 0,
+                duration: 0.8,
+              },
+              "-=0.2"
+            )
+            .from(
+              ".agency-description",
+              {
+                y: 25,
+                opacity: 0,
+                duration: 0.6,
+              },
+              "-=0.4"
+            )
+            .from(
+              ".agency-button",
+              {
+                y: 15,
+                opacity: 0,
+                scale: 0.95,
+                duration: 0.5,
+              },
+              "-=0.3"
+            )
+            .from(
+              ".agency-benefit",
+              {
+                x: -15,
+                opacity: 0,
+                stagger: 0.1,
+                duration: 0.4,
+              },
+              "-=0.2"
+            )
+            .from(
+              ".agency-form",
+              {
+                x: 45,
+                opacity: 0,
+                scale: 0.97,
+                duration: 0.8,
+              },
+              "-=0.6"
+            );
+
+          // SECTION HEADINGS
+
+          gsap.utils.toArray(".agency-section-heading").forEach(
+            (heading) => {
+              gsap.from(heading, {
+                y: 35,
+                opacity: 0,
+                duration: 0.7,
+                ease: "power3.out",
+                scrollTrigger: {
+                  trigger: heading,
+                  start: "top 85%",
+                  once: true,
+                },
+              });
+            }
+          );
+
+          // BENEFIT CARDS
+
+          gsap.from(".agency-card", {
+            y: 45,
             opacity: 0,
-            duration: 0.9,
-          },
-          "-=0.3"
-        )
+            scale: 0.96,
+            stagger: 0.12,
+            duration: 0.7,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: ".agency-cards",
+              start: "top 82%",
+              once: true,
+            },
+          });
 
-        .from(
-          ".agency-description",
-          {
-            y: 30,
+          // HOW IT WORKS
+
+          gsap.from(".agency-step", {
+            y: 35,
             opacity: 0,
-            duration: 0.6,
-          },
-          "-=0.5"
-        )
+            stagger: 0.15,
+            duration: 0.7,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: ".agency-steps",
+              start: "top 82%",
+              once: true,
+            },
+          });
 
-        .from(
-          ".agency-button",
-          {
-            y: 20,
-            opacity: 0,
-            scale: 0.9,
-            duration: 0.5,
-          },
-          "-=0.3"
-        )
+          // REQUIREMENTS
 
-        .from(
-          ".agency-benefit",
-          {
+          gsap.from(".agency-requirement", {
             x: -20,
             opacity: 0,
-            duration: 0.4,
-            stagger: 0.12,
-          },
-          "-=0.2"
-        )
-
-        .from(
-          ".agency-form",
-          {
-            x: 70,
-            opacity: 0,
-            scale: 0.95,
-            duration: 0.9,
-          },
-          "-=0.7"
-        )
-
-        .from(
-          ".agency-note",
-          {
-            y: 20,
-            opacity: 0,
+            stagger: 0.1,
             duration: 0.5,
-          },
-          "-=0.4"
-        );
-
-      // =================================
-      // FORM FLOATING ANIMATION
-      // =================================
-
-      gsap.to(".agency-form", {
-        y: 0,
-        duration: 2.5,
-        ease: "sine.inOut",
-        delay: 1,
-      });
-
-      // =================================
-      // HERO CTA HOVER
-      // =================================
-
-      const button =
-        pageRef.current?.querySelector(".agency-button");
-
-      if (button) {
-        const enter = () => {
-          gsap.to(button, {
-            y: -3,
-            scale: 1.05,
-            duration: 0.25,
             ease: "power2.out",
+            scrollTrigger: {
+              trigger: ".agency-requirements",
+              start: "top 85%",
+              once: true,
+            },
           });
-        };
 
-        const leave = () => {
-          gsap.to(button, {
-            y: 0,
-            scale: 1,
-            duration: 0.25,
-            ease: "power2.out",
+          // TERMS SECTION
+
+          gsap.from(".agency-terms-section", {
+            y: 30,
+            opacity: 0,
+            duration: 0.7,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: ".agency-terms-section",
+              start: "top 88%",
+              once: true,
+            },
           });
-        };
 
-        button.addEventListener("mouseenter", enter);
-        button.addEventListener("mouseleave", leave);
+          // FINAL CTA
 
-        button._enter = enter;
-        button._leave = leave;
-      }
-
-      // =================================
-      // TERMS BUTTON HOVER
-      // =================================
-
-      const termsButton =
-        pageRef.current?.querySelector(
-          ".agency-terms-button"
-        );
-
-      if (termsButton) {
-        const enter = () => {
-          gsap.to(termsButton, {
-            y: -3,
-            scale: 1.03,
-            duration: 0.25,
-            ease: "power2.out",
+          gsap.from(".agency-final-cta", {
+            y: 35,
+            opacity: 0,
+            duration: 0.8,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: ".agency-final-cta",
+              start: "top 85%",
+              once: true,
+            },
           });
-        };
-
-        const leave = () => {
-          gsap.to(termsButton, {
-            y: 0,
-            scale: 1,
-            duration: 0.25,
-            ease: "power2.out",
-          });
-        };
-
-        termsButton.addEventListener("mouseenter", enter);
-        termsButton.addEventListener("mouseleave", leave);
-
-        termsButton._enter = enter;
-        termsButton._leave = leave;
-      }
-
-      // =================================
-      // WHY PARTNER HEADING
-      // =================================
-
-      gsap.from(".agency-section-heading", {
-        y: 50,
-        opacity: 0,
-        duration: 0.8,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: ".agency-section-heading",
-          start: "top 85%",
-        },
-      });
-
-      // =================================
-      // CARDS SCROLL ANIMATION
-      // =================================
-
-      gsap.from(".agency-card", {
-        y: 50,
-        opacity: 0,
-        scale: 0.95,
-        duration: 0.7,
-        stagger: 0.15,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: ".agency-cards",
-          start: "top 80%",
-        },
-      });
-
-      // =================================
-      // TERMS SECTION ANIMATION
-      // =================================
-
-      gsap.from(".agency-terms-section", {
-        y: 30,
-        opacity: 0,
-        duration: 0.7,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: ".agency-terms-section",
-          start: "top 88%",
-        },
-      });
+        }
+      );
     }, pageRef);
 
     return () => {
-      const button =
-        pageRef.current?.querySelector(".agency-button");
-
-      if (button) {
-        button.removeEventListener(
-          "mouseenter",
-          button._enter
-        );
-
-        button.removeEventListener(
-          "mouseleave",
-          button._leave
-        );
-      }
-
-      const termsButton =
-        pageRef.current?.querySelector(
-          ".agency-terms-button"
-        );
-
-      if (termsButton) {
-        termsButton.removeEventListener(
-          "mouseenter",
-          termsButton._enter
-        );
-
-        termsButton.removeEventListener(
-          "mouseleave",
-          termsButton._leave
-        );
-      }
-
       ctx.revert();
     };
   }, []);
 
-  // =========================================================
-  // CARD HOVER
-  // =========================================================
+  // ==========================================
+  // CARD HOVER ANIMATIONS
+  // ==========================================
 
   const handleCardEnter = (e) => {
     gsap.to(e.currentTarget, {
-      y: -8,
-      scale: 1.02,
+      y: -7,
       duration: 0.3,
       ease: "power2.out",
     });
@@ -277,107 +265,132 @@ const BecomeAgency = () => {
   const handleCardLeave = (e) => {
     gsap.to(e.currentTarget, {
       y: 0,
-      scale: 1,
       duration: 0.3,
       ease: "power2.out",
     });
   };
 
-  // =========================================================
+  // ==========================================
   // JSX
-  // =========================================================
+  // ==========================================
 
   return (
-    <div ref={pageRef} className="min-h-screen overflow-x-clip bg-white">
+    <main
+      ref={pageRef}
+      className="min-h-screen overflow-x-clip bg-white"
+    >
+      {/* ==========================================
+          01. HERO SECTION
+      ========================================== */}
 
-      {/* ==================================================
-          HERO SECTION
-      ================================================== */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#f4f8f5] via-[#eef4ef] to-[#e7eee9] px-7 py-12 sm:px-6 sm:py-16 lg:px-12 lg:py-20 xl:px-20">
 
-      <section className="bg-gradient-to-r from-gray-100 to-gray-200 px-4 py-8 sm:px-6 sm:py-10 lg:px-12 lg:py-7 xl:px-25">
+        {/* Background Decoration */}
 
-        <div className="mx-auto flex w-full max-w-7xl flex-col items-stretch justify-between gap-8 sm:gap-10 lg:flex-row lg:items-center lg:gap-8">
+        <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-green-700/5 blur-3xl" />
 
-          {/* ==================================================
-              LEFT SIDE
-          ================================================== */}
+        <div className="pointer-events-none absolute -bottom-24 left-0 h-64 w-64 rounded-full bg-orange-400/5 blur-3xl" />
 
-          <div className="flex w-full min-w-0 flex-col justify-start lg:min-h-[calc(100vh-64px)] lg:w-[52%] lg:-translate-y-3">
+        <div className="relative mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-14">
 
-            {/* Small Heading */}
-            <p className="agency-tag mb-3 text-[11px] font-bold tracking-[1.8px] text-green-700 sm:mb-4 sm:text-xs sm:tracking-[2px]">
-              PARTNER WITH PESTFIND
-            </p>
+          {/* LEFT CONTENT */}
 
-            {/* Main Heading */}
-            <h1 className="agency-title max-w-3xl text-4xl font-bold leading-[1.05] text-[#0d2119] sm:text-5xl md:text-6xl lg:text-[64px]">
-              Grow With{" "}
+          <div className="flex min-w-0 flex-col items-start lg:-translate-y-50">
+
+            {/* Tag */}
+
+            <div className="agency-tag mb-5 inline-flex items-center gap-2 rounded-full border border-green-700/15 bg-white/80 px-4 py-2 ">
+
+              <span className="h-2 w-2 rounded-full bg-green-600" />
+
+              <span className="text-[10px] font-bold tracking-[2px] text-green-800 sm:text-xs">
+                PARTNER WITH PESTFIND
+              </span>
+
+            </div>
+
+            {/* Heading */}
+
+            <h1 className="agency-title max-w-2xl text-4xl font-bold leading-[1.08] tracking-tight text-[#0d2119] sm:text-5xl md:text-6xl lg:text-[58px] xl:text-[58px]">
+
+              Grow Your Business With{" "}
+
               <span className="text-green-700">
                 PestFind.
               </span>
+
             </h1>
 
             {/* Description */}
-            <p className="agency-description mt-4 w-full max-w-xl rounded-xl bg-[#f1f8f4] p-3 text-base leading-6 text-gray-600 sm:mt-6 sm:p-4 sm:text-lg sm:leading-7">
+
+            <p className="agency-description mt-6 max-w-xl text-base leading-7 text-gray-600 sm:text-lg sm:leading-8">
+
               Become a PestFind service partner and receive
               relevant customer requests for the areas you
-              serve.
+              serve. Grow your reach and connect with more
+              potential customers.
+
             </p>
 
-            {/* CTA */}
-            <Link
-              to="/become-agency"
-              className="agency-button mt-4 inline-flex w-full items-center justify-center rounded-xl bg-orange-500 px-5 py-3.5 text-center text-sm font-bold leading-5 text-white shadow-lg shadow-orange-500/20 transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 sm:w-fit sm:px-6 sm:py-4 sm:text-base"
-            >
-              Become a PestFind Agency →
-            </Link>
-
             {/* Benefits */}
-            <div className="mt-6 grid grid-cols-1 gap-3 text-sm text-gray-600 sm:grid-cols-2 sm:gap-x-5 sm:gap-y-3 lg:grid-cols-1 lg:gap-4">
 
-              <p className="agency-benefit">
-                <span className="mr-2 text-green-700">
-                  ✓
-                </span>
-                Relevant Leads
-              </p>
+            <div className="mt-9 grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:max-w-xl">
 
-              <p className="agency-benefit">
-                <span className="mr-2 text-green-700">
-                  ✓
-                </span>
-                Local Opportunities
-              </p>
+              {[
+                "Relevant Customer Leads",
+                "Local Business Opportunities",
+                "Organised Requests",
+                "Simple Communication",
+              ].map((benefit, index) => (
+                <div
+                  key={index}
+                  className="agency-benefit flex items-center gap-3"
+                >
 
-              <p className="agency-benefit">
-                <span className="mr-2 text-green-700">
-                  ✓
-                </span>
-                Organised Requests
-              </p>
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-green-700/10 text-xs font-bold text-green-700">
+                    ✓
+                  </span>
 
-              <p className="agency-benefit">
-                <span className="mr-2 text-green-700">
-                  ✓
-                </span>
-                Simple Communication
-              </p>
+                  <span className="text-sm font-medium text-gray-700">
+                    {benefit}
+                  </span>
+
+                </div>
+              ))}
 
             </div>
 
           </div>
 
-          {/* ==================================================
-              RIGHT SIDE
-          ================================================== */}
+          {/* RIGHT FORM */}
 
-          <div className="mb-2 w-full min-w-0 px-0 sm:px-1 lg:mb-0 lg:w-[48%]">
+          <div
+            id="agency-registration"
+            className="w-full min-w-0 scroll-mt-8 lg:-translate-y-6"
+          >
 
-            <div className="agency-form flex h-fit w-full min-w-0 items-center justify-center overflow-hidden rounded-2xl bg-white shadow-lg shadow-gray-700/10 sm:rounded-[30px]">
+            <div className="agency-form relative mx-auto w-full max-w-xl overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-[0_20px_70px_rgba(0,0,0,0.09)] sm:rounded-[28px]">
 
-              <BecomeAgencyForm />
+              {/* Form Top Accent */}
+
+              <div className="h-1.5 w-full bg-gradient-to-r from-green-700 via-green-500 to-orange-400" />
+
+              <div className="w-full min-w-0 p-3 sm:p-5 lg:p-6">
+
+                <BecomeAgencyForm />
+
+              </div>
 
             </div>
+
+            {/* Form Note */}
+
+            <p className="agency-note mt-4 text-center text-xs leading-6 text-gray-500 sm:text-sm">
+
+              Submit your details to express your interest
+              in becoming a PestFind service partner.
+
+            </p>
 
           </div>
 
@@ -386,156 +399,241 @@ const BecomeAgency = () => {
       </section>
 
 
-      {/* ==================================================
-          WHY PARTNER SECTION
-      ================================================== */}
+      {/* ==========================================
+          02. WHY PARTNER WITH PESTFIND
+      ========================================== */}
 
-      <section className="bg-white px-4 py-12 sm:px-6 sm:py-16 lg:px-20 lg:py-20">
+      <section className="bg-white px-4 py-16 sm:px-6 sm:py-20 lg:px-16 lg:py-24">
 
-        {/* Heading */}
+        <div className="mx-auto max-w-7xl">
 
-        <div className="agency-section-heading mx-auto mb-8 max-w-2xl px-1 text-center sm:mb-10">
+          {/* Section Heading */}
 
-          <h2 className="text-3xl font-bold leading-tight text-[#0d2119] sm:text-4xl md:text-5xl">
-            Why partner with PestFind?
+          <div className="agency-section-heading mx-auto mb-12 max-w-2xl text-center sm:mb-14">
+
+            <span className="text-xs font-bold tracking-[2px] text-green-700">
+              WHY CHOOSE PESTFIND
+            </span>
+
+            <h2 className="mt-4 text-3xl font-bold leading-tight tracking-tight text-[#0d2119] sm:text-4xl md:text-5xl">
+
+              Why Partner With{" "}
+
+              <span className="text-green-700">
+                PestFind?
+              </span>
+
+            </h2>
+
+            <p className="mt-5 text-sm leading-7 text-gray-500 sm:text-base">
+
+              A straightforward way for pest control agencies
+              to connect with customer enquiries and explore
+              local business opportunities.
+
+            </p>
+
+          </div>
+
+          {/* Benefit Cards */}
+
+          <div className="agency-cards grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+
+            {benefits.map((benefit) => (
+              <div
+                key={benefit.number}
+                onMouseEnter={handleCardEnter}
+                onMouseLeave={handleCardLeave}
+                className="agency-card group rounded-2xl border border-gray-100 bg-white p-6 shadow-[0_5px_25px_rgba(0,0,0,0.04)] transition-colors duration-300 hover:border-green-700/20 hover:shadow-[0_15px_35px_rgba(0,0,0,0.08)] sm:rounded-3xl sm:p-7"
+              >
+
+                {/* Card Number */}
+
+                <div className="flex items-center justify-between">
+
+                  <span className="text-xs font-bold tracking-widest text-gray-400">
+                    {benefit.number}
+                  </span>
+
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-50 text-2xl text-green-700 transition-colors duration-300 group-hover:bg-green-700 group-hover:text-white">
+                    {benefit.icon}
+                  </div>
+
+                </div>
+
+                {/* Card Content */}
+
+                <h3 className="mt-7 text-lg font-bold text-[#0d2119]">
+                  {benefit.title}
+                </h3>
+
+                <p className="mt-3 text-sm leading-6 text-gray-500">
+                  {benefit.description}
+                </p>
+
+                {/* Bottom Accent */}
+
+                <div className="mt-7 h-1 w-10 rounded-full bg-green-700/20 transition-all duration-300 group-hover:w-16 group-hover:bg-green-700" />
+
+              </div>
+            ))}
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      {/* ==========================================
+          03. HOW IT WORKS
+      ========================================== */}
+
+      <section className="agency-sections bg-gradient-to-br from-[#f4f8f5] via-[#eef4ef] to-[#e7eee9] px-8 py-16 sm:px-6 sm:py-20 lg:px-16 lg:py-24">
+
+        <div className="mx-auto max-w-7xl">
+
+          {/* Heading */}
+
+          <div className="agency-section-heading mx-auto mb-12 max-w-2xl text-center sm:mb-16">
+
+            <span className="text-xs font-bold tracking-[2px] text-green-700">
+              SIMPLE PARTNERSHIP PROCESS
+            </span>
+
+            <h2 className="mt-4 text-3xl font-bold leading-tight text-[#0d2119] sm:text-4xl md:text-5xl">
+
+              How It <span className="text-green-700">Works</span>
+
+            </h2>
+
+            <p className="mt-4 text-sm leading-7 text-gray-500 sm:text-base">
+
+              Getting started with PestFind is simple.
+              Follow these steps to begin your agency partnership.
+
+            </p>
+
+          </div>
+
+          {/* Steps */}
+
+          <div className="agency-steps grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+
+            {steps.map((step, index) => (
+              <div
+                key={step.number}
+                className="agency-step relative rounded-2xl border border-gray-100 bg-white p-6 shadow-sm sm:p-7"
+              >
+
+                {/* Step Number */}
+
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-700 text-sm font-bold text-white shadow-lg shadow-green-700/15">
+                  {step.number}
+                </div>
+
+                {/* Connector */}
+
+                {index !== steps.length - 1 && (
+                  <div className="absolute right-0 top-12 hidden h-px w-5 translate-x-full bg-green-700/20 lg:block" />
+                )}
+
+                <h3 className="mt-7 text-lg font-bold text-[#0d2119]">
+                  {step.title}
+                </h3>
+
+                <p className="mt-3 text-sm leading-6 text-gray-500">
+                  {step.description}
+                </p>
+
+              </div>
+            ))}
+
+          </div>
+
+          {/* CTA */}
+
+          <div className="mt-10 text-center">
+
+            <a
+              href="#agency-registration"
+              className="inline-flex items-center gap-2 text-sm font-bold text-green-700 transition-colors hover:text-green-900"
+            >
+
+              Start Your Partnership
+
+              <span className="text-lg">
+                →
+              </span>
+
+            </a>
+
+          </div>
+
+        </div>
+
+      </section>
+      {/* ==========================================
+          05. TERMS & CONDITIONS
+      ========================================== */}
+
+      <section className="agency-terms-section border-t border-gray-100 bg-white px-4 py-14 sm:px-6 sm:py-16 lg:px-16">
+
+        <div className="mx-auto flex max-w-5xl flex-col items-center text-center">
+
+          {/* Icon */}
+
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-green-700/10 text-green-700">
+
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="25"
+              height="25"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <path d="M14 2v6h6" />
+              <path d="M8 13h8" />
+              <path d="M8 17h8" />
+              <path d="M8 9h2" />
+            </svg>
+
+          </div>
+
+          <span className="mt-5 text-xs font-bold tracking-[2px] text-green-700">
+            IMPORTANT INFORMATION
+          </span>
+
+          <h2 className="mt-3 text-2xl font-extrabold text-[#0d2119] sm:text-3xl">
+            Agency Terms & Conditions
           </h2>
 
-        </div>
+          <p className="mt-4 max-w-xl text-sm leading-7 text-gray-500 sm:text-base">
 
+            Before joining the PestFind partner network,
+            review the terms and conditions governing agency
+            participation and partnership responsibilities.
 
-        {/* ==================================================
-            CARDS
-        ================================================== */}
-
-        <div className="agency-cards mx-auto grid w-full max-w-6xl grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
-
-          {/* CARD 1 */}
-
-          <div
-            className="agency-card min-w-0 rounded-2xl bg-green-700 p-5 shadow-lg shadow-gray-700/15 sm:rounded-[28px] sm:p-6"
-            onMouseEnter={handleCardEnter}
-            onMouseLeave={handleCardLeave}
-          >
-
-            <div className="mb-5 flex h-8 w-8 items-center justify-center rounded-lg bg-green-50 text-xs font-bold text-green-700">
-              01
-            </div>
-
-            <h3 className="text-lg font-bold text-white">
-              Relevant requests
-            </h3>
-
-            <p className="mt-3 text-sm leading-5 text-white">
-              Receive opportunities aligned with the areas
-              and services you provide.
-            </p>
-
-          </div>
-
-
-          {/* CARD 2 */}
-
-          <div
-            className="agency-card min-w-0 rounded-2xl bg-green-700 p-5 shadow-lg shadow-gray-700/15 sm:rounded-[28px] sm:p-6"
-            onMouseEnter={handleCardEnter}
-            onMouseLeave={handleCardLeave}
-          >
-
-            <div className="mb-5 flex h-8 w-8 items-center justify-center rounded-lg bg-green-50 text-xs font-bold text-green-700">
-              02
-            </div>
-
-            <h3 className="text-lg font-bold text-white">
-              Local opportunities
-            </h3>
-
-            <p className="mt-3 text-sm leading-5 text-white">
-              Build demand in the locations where your team
-              operates.
-            </p>
-
-          </div>
-
-
-          {/* CARD 3 */}
-
-          <div
-            className="agency-card min-w-0 rounded-2xl bg-green-700 p-5 shadow-lg shadow-gray-700/15 sm:rounded-[28px] sm:p-6"
-            onMouseEnter={handleCardEnter}
-            onMouseLeave={handleCardLeave}
-          >
-
-            <div className="mb-5 flex h-8 w-8 items-center justify-center rounded-lg bg-green-50 text-xs font-bold text-green-700">
-              03
-            </div>
-
-            <h3 className="text-lg font-bold text-white">
-              Organised communication
-            </h3>
-
-            <p className="mt-3 text-sm leading-5 text-white">
-              Clear customer requirements and preferred
-              timing.
-            </p>
-
-          </div>
-
-
-          {/* CARD 4 */}
-
-          <div
-            className="agency-card min-w-0 rounded-2xl bg-green-700 p-5 shadow-lg shadow-gray-700/15 sm:rounded-[28px] sm:p-6"
-            onMouseEnter={handleCardEnter}
-            onMouseLeave={handleCardLeave}
-          >
-
-            <div className="mb-5 flex h-8 w-8 items-center justify-center rounded-lg bg-green-50 text-xs font-bold text-green-700">
-              04
-            </div>
-
-            <h3 className="text-lg font-bold text-white">
-              Simple process
-            </h3>
-
-            <p className="mt-3 text-sm leading-5 text-white">
-              Respond to the request and coordinate the
-              confirmed service.
-            </p>
-
-          </div>
-
-        </div>
-
-
-        {/* ==================================================
-            TERMS & CONDITIONS
-        ================================================== */}
-
-        <div className="agency-terms-section mx-auto mt-12 flex w-full max-w-6xl flex-col items-center border-t border-gray-200 px-1 pt-8 text-center sm:mt-14 sm:pt-9">
-
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f1f8f4] text-lg text-green-700">
-            ↓
-          </div>
-
-          <h3 className="mt-4 text-lg font-bold text-[#0d2119] sm:text-xl">
-            Agency Terms & Conditions
-          </h3>
-
-          <p className="mt-2 max-w-lg text-sm leading-6 text-gray-500 sm:px-2">
-            Review the terms and conditions governing
-            PestFind agency and partner participation.
           </p>
+
+          {/* Download Button */}
 
           <a
             href="/PestFind_Agency_Terms_Conditions.pdf"
             download="PestFind_Agency_Terms_Conditions.pdf"
-            className="agency-terms-button group mt-5 inline-flex w-full max-w-md items-center justify-center gap-3 rounded-xl border border-[#0d2119] bg-white px-4 py-3 text-center text-sm font-bold leading-5 text-[#0d2119] shadow-sm transition-all duration-300 hover:bg-[#0d2119] hover:text-white hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0d2119] focus-visible:ring-offset-2 sm:w-auto sm:px-7 sm:py-3.5"
+            className="agency-terms-button group mt-7 inline-flex w-full items-center justify-center gap-3 rounded-xl border border-[#0d2119] bg-white px-6 py-4 text-sm font-bold text-[#0d2119] shadow-sm transition-all duration-300 hover:-translate-y-1 hover:bg-[#0d2119] hover:text-white hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-700 focus-visible:ring-offset-2 sm:w-fit sm:px-8"
           >
 
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="17"
-              height="17"
+              width="18"
+              height="18"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -550,41 +648,76 @@ const BecomeAgency = () => {
               <path d="M5 21h14" />
             </svg>
 
-            <span>
-              Download Agency Terms & Conditions
-            </span>
+            Download Agency Terms & Conditions
 
           </a>
 
         </div>
 
+      </section>
 
-        {/* ==================================================
-            DESCRIPTION
-        ================================================== */}
 
-        <p className="mx-auto mt-8 max-w-2xl px-1 text-center text-base font-bold leading-6 text-gray-700 sm:mt-10 sm:text-lg">
+      {/* ==========================================
+          06. FINAL CTA
+      ========================================== */}
 
-          PestFind gives agencies a clear, brand-friendly way
-          to receive customer requests that already include
-          the details needed for a useful{" "}
+      <section className="agency-final-cta bg-gradient-to-br from-[#f4f8f5] via-[#eef4ef] to-[#e7eee9] px-4 py-16 sm:px-6 sm:py-20 lg:px-16 lg:py-24">
 
-          <span className="text-green-700">
-            first call.
-          </span>
+        <div className="relative mx-auto max-w-7xl overflow-hidden rounded-3xl bg-green-800 px-6 py-12 text-center shadow-xl shadow-green-900/10 sm:px-12 sm:py-16">
 
-        </p>
+          {/* Background Decoration */}
+
+          <div className="pointer-events-none absolute -left-20 -top-20 h-64 w-64 rounded-full border-[40px] border-white/5" />
+
+          <div className="pointer-events-none absolute -bottom-28 -right-16 h-72 w-72 rounded-full border-[45px] border-white/5" />
+
+          <div className="relative mx-auto max-w-3xl">
+
+            <span className="text-xs font-bold tracking-[2px] text-green-100">
+              YOUR BUSINESS. MORE OPPORTUNITIES.
+            </span>
+
+            <h2 className="mt-5 text-3xl font-bold leading-tight text-white sm:text-4xl md:text-5xl">
+
+              Ready to Grow With PestFind?
+
+            </h2>
+
+            <p className="mx-auto mt-5 max-w-xl text-sm leading-7 text-green-50 sm:text-base">
+
+              Take the next step towards becoming a PestFind
+              service partner. Register your agency and tell
+              us about the services you provide.
+
+            </p>
+
+            <a
+              href="#agency-registration"
+              className="mt-8 inline-flex w-full items-center justify-center gap-3 rounded-xl bg-orange-600 px-7 py-4 text-sm font-bold text-white shadow-lg shadow-black/10 transition-all duration-300 hover:-translate-y-1 hover:bg-orange-700 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-green-700 sm:w-fit sm:text-base"
+            >
+
+              Become a PestFind Agency
+
+              <span className="text-lg">
+                →
+              </span>
+
+            </a>
+
+          </div>
+
+        </div>
 
       </section>
 
 
-      {/* ==================================================
-          FOOTER
-      ================================================== */}
+      {/* ==========================================
+          07. FOOTER
+      ========================================== */}
 
       <Footer />
 
-    </div>
+    </main>
   );
 };
 

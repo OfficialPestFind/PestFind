@@ -21,7 +21,7 @@ const guides = [
       "https://www.pexels.com/photo/a-happy-family-sitting-on-gray-sofa-with-their-dog-7677739/",
     photoCredit: "PNW Production",
     readTime: "8 min read",
-    href: "/blog/pest-control-safety",
+    href: "/PestControlSafety",
     imagePosition: "center 42%",
   },
   {
@@ -37,7 +37,7 @@ const guides = [
       "https://www.pexels.com/photo/cockroach-in-macro-photography-11022142/",
     photoCredit: "Erik Karits",
     readTime: "12 min read",
-    href: "/blog/cockroach-control",
+    href: "/CockroachControlGuide",
     imagePosition: "center 50%",
   },
   {
@@ -53,7 +53,7 @@ const guides = [
       "https://www.pexels.com/photo/smoke-used-for-pest-control-19789841/",
     photoCredit: "Garda Pest Control Indonesia",
     readTime: "9 min read",
-    href: "/blog/pest-control-near-me",
+    href: "/PestControlNearMe",
     imagePosition: "center 48%",
   },
 ];
@@ -270,15 +270,7 @@ const PestGuides = () => {
                   {guide.readTime}
                 </span>
 
-                <a
-                  href={guide.photoPage}
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label={`View photo by ${guide.photoCredit} on Pexels`}
-                  className="absolute bottom-4 right-4 rounded-full bg-white/90 px-2.5 py-1.5 text-[10px] font-semibold text-slate-700 opacity-90 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 sm:bottom-5 sm:right-5"
-                >
-                  Photo: Pexels
-                </a>
+                
               </div>
 
               {/* Card body */}
