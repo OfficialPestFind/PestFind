@@ -391,12 +391,12 @@ const Residential = () => {
               </Link>
 
               <Link
-  to="#free-commercial-checklist"
+  to="#free-home-checklist"
   onClick={(e) => {
     e.preventDefault();
 
     document
-      .getElementById("free-commercial-checklist")
+      .getElementById("free-home-checklist")
       ?.scrollIntoView({
         behavior: "smooth",
         block: "start",
