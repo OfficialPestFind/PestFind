@@ -190,7 +190,8 @@ useEffect(() => {
                 Made
               </span>
 
-              <br className="hidden sm:block" />
+              <br className=" sm:block" />
+              
 
               <span className="text-green-700">
                 Easier
