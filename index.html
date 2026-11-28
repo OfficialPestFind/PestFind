@@ -7,9 +7,13 @@
     <script>
       (function(w,d,s,l,i){
         w[l]=w[l]||[];
-        w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
+        w[l].push({
+          'gtm.start': new Date().getTime(),
+          event:'gtm.js'
+        });
         var f=d.getElementsByTagName(s)[0],
-        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
+        j=d.createElement(s),
+        dl=l!='dataLayer'?'&l='+l:'';
         j.async=true;
         j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
         f.parentNode.insertBefore(j,f);
@@ -17,6 +21,7 @@
     </script>
     <!-- End Google Tag Manager -->
 
+    <!-- Favicon -->
     <link
       rel="icon"
       type="image/png"
@@ -24,7 +29,16 @@
       href="/PestfindLogo.png"
     />
 
+    <!-- Viewport -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Google Search Console Verification -->
+    <meta
+      name="google-site-verification"
+      content="sGESqNe9vI8mhBuibX05uv3Va2-03UxQGc7SJtwU0C8"
+    />
+
+    <!-- Website Title -->
     <title>pestfind</title>
   </head>
 
@@ -40,7 +54,9 @@
     </noscript>
     <!-- End Google Tag Manager (noscript) -->
 
+    <!-- React Root -->
     <div id="root"></div>
+
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
